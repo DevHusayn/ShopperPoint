@@ -10,7 +10,7 @@ import { formatNaira } from '../utils/formatters';
 
 const Checkout = () => {
     const navigate = useNavigate();
-    const { cart, activeStore, subtotal, clearCart, removeFromCart } = useCart();
+    const { cart, activeStore, subtotal, clearCart, removeFromCart, selectedAddress } = useCart();
     const { user } = useAuth();
     const { addOrder } = useOrders();
     const [isProcessing, setIsProcessing] = useState(false);
@@ -131,16 +131,18 @@ const Checkout = () => {
                 <section className="bg-white rounded-2xl p-4 shadow-sm border-l-4 border-brand-orange">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-[10px] uppercase font-black text-gray-400 tracking-widest">Delivery Address</h2>
-                        <button className="text-xs font-bold text-brand-orange">Change</button>
+                        <button className="text-xs font-bold text-brand-orange" onClick={() => navigate('/addresses')}>Change</button>
                     </div>
                     <div className="flex gap-3 items-start">
                         <FontAwesomeIcon icon={faMapMarkerAlt} className="text-brand-orange mt-1" size="18" />
                         <div>
-                            <p className="text-sm font-bold text-brand-navy">Home</p>
-                            <p className="text-xs text-gray-500 leading-relaxed">Plot 12, Admiralty Way, Lekki Phase 1, Lagos</p>
-                            <div className="mt-2 bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] font-bold inline-block">
-                                Landmark: Near the big yellow gate
-                            </div>
+                            <p className="text-sm font-bold text-brand-navy">{selectedAddress?.nickname || 'No Address Selected'}</p>
+                            <p className="text-xs text-gray-500 leading-relaxed">{selectedAddress ? `${selectedAddress.street}, ${selectedAddress.area}` : 'Please select a delivery address.'}</p>
+                            {selectedAddress?.landmark && (
+                                <div className="mt-2 bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] font-bold inline-block">
+                                    Landmark: {selectedAddress.landmark}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>

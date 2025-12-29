@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
+import ConfirmModal from '../components/modals/ConfirmModal';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faLocationArrow, faPlus, faTrash, faHome, faBriefcase, faMap, faChevronLeft, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../context/CartContext'; // Note: Addresses can be managed via Cart or Auth context
 
+
 const AddressManager = () => {
     const navigate = useNavigate();
-    // Using a local mock state here, but in production, this connects to your CartContext/Supabase
-    const [addresses, setAddresses] = useState([
-        {
-            id: 1,
-            nickname: 'Home',
-            street: '12 Admiralty Way',
-            area: 'Lekki Phase 1, Lagos',
-            landmark: 'Opposite Kilimanjaro Chicken',
-            selected: true
-        }
-    ]);
+    const { selectedAddress, setSelectedAddress } = useCart();
+    // Persistent addresses using localStorage
+    const [addresses, setAddresses] = useState(() => {
+        const saved = localStorage.getItem('sp_addresses');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    // Save addresses to localStorage whenever they change
+    React.useEffect(() => {
+        localStorage.setItem('sp_addresses', JSON.stringify(addresses));
+    }, [addresses]);
 
     const [isAdding, setIsAdding] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
     const [locating, setLocating] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -43,7 +46,7 @@ const AddressManager = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const newAddr = { ...formData, id: Date.now(), selected: false };
-        setAddresses([...addresses, newAddr]);
+        setAddresses(prev => [...prev, newAddr]);
         setIsAdding(false);
         setFormData({ nickname: 'Home', street: '', area: '', landmark: '' });
     };
@@ -63,39 +66,68 @@ const AddressManager = () => {
                     <>
                         {/* Address List */}
                         <div className="space-y-3">
-                            {addresses.map(addr => (
-                                <div
-                                    key={addr.id}
-                                    className={`bg-white p-4 rounded-2xl shadow-sm border-2 transition-all ${addr.selected ? 'border-brand-orange' : 'border-transparent'
-                                        } flex justify-between items-start`}
-                                >
-                                    <div className="flex gap-4">
-                                        <div className="bg-orange-50 p-3 rounded-xl h-fit text-brand-orange">
-                                            {addr.nickname === 'Home' ? <FontAwesomeIcon icon={faHome} size="lg" /> : <FontAwesomeIcon icon={faBriefcase} size="lg" />}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="font-bold text-brand-navy">{addr.nickname}</span>
-                                                {addr.selected && (
-                                                    <span className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-black uppercase tracking-tighter">
-                                                        Default
-                                                    </span>
-                                                )}
+                            {addresses.map(addr => {
+                                const isSelected = selectedAddress && selectedAddress.id === addr.id;
+                                return (
+                                    <div
+                                        key={addr.id}
+                                        className={`bg-white p-4 rounded-2xl shadow-sm border-2 transition-all ${isSelected ? 'border-brand-orange' : 'border-transparent'} flex justify-between items-start cursor-pointer`}
+                                        onClick={() => {
+                                            setSelectedAddress(addr);
+                                            navigate('/checkout');
+                                        }}
+                                    >
+                                        <div className="flex gap-4">
+                                            <div className="bg-orange-50 p-3 rounded-xl h-fit text-brand-orange">
+                                                {addr.nickname === 'Home' ? <FontAwesomeIcon icon={faHome} size="lg" /> : <FontAwesomeIcon icon={faBriefcase} size="lg" />}
                                             </div>
-                                            <p className="text-xs text-gray-500 leading-tight mb-2">{addr.street}, {addr.area}</p>
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-bold text-brand-navy">{addr.nickname}</span>
+                                                    {isSelected && (
+                                                        <span className="text-[9px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-black uppercase tracking-tighter">
+                                                            In Use
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-gray-500 leading-tight mb-2">{addr.street}, {addr.area}</p>
 
-                                            {/* Landmark Badge - Critical for Logistics */}
-                                            <div className="inline-flex items-center gap-2 bg-brand-navy text-white px-3 py-1.5 rounded-lg">
-                                                <FontAwesomeIcon icon={faMap} size="xs" className="text-brand-orange" />
-                                                <span className="text-[10px] font-bold">Landmark: {addr.landmark}</span>
+                                                {/* Landmark Badge - Critical for Logistics */}
+                                                <div className="inline-flex items-center gap-2 bg-brand-navy text-white px-3 py-1.5 rounded-lg">
+                                                    <FontAwesomeIcon icon={faMap} size="xs" className="text-brand-orange" />
+                                                    <span className="text-[10px] font-bold">Landmark: {addr.landmark}</span>
+                                                </div>
                                             </div>
                                         </div>
+                                        <button
+                                            className="text-gray-300 hover:text-red-500 transition-colors"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setConfirmDelete({ open: true, id: addr.id });
+                                            }}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} size="lg" />
+                                        </button>
+                                        {/* Confirm Delete Modal */}
+                                        <ConfirmModal
+                                            open={confirmDelete.open}
+                                            title="Delete Address"
+                                            message="Are you sure you want to delete this address?"
+                                            confirmText="Delete"
+                                            cancelText="Cancel"
+                                            onConfirm={() => {
+                                                setAddresses(prev => prev.filter(a => a.id !== confirmDelete.id));
+                                                // If the deleted address was selected, clear selectedAddress
+                                                if (selectedAddress && selectedAddress.id === confirmDelete.id) {
+                                                    setSelectedAddress(null);
+                                                }
+                                                setConfirmDelete({ open: false, id: null });
+                                            }}
+                                            onCancel={() => setConfirmDelete({ open: false, id: null })}
+                                        />
                                     </div>
-                                    <button className="text-gray-300 hover:text-red-500 transition-colors">
-                                        <FontAwesomeIcon icon={faTrash} size="lg" />
-                                    </button>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         <button

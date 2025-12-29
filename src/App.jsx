@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faHome, faBoxOpen, faUser, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ import AddressManager from './pages/AddressManager';
 import SearchPage from './pages/Search';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';
+import AddressMapPicker from './pages/AddressMapPicker';
 
 // Components
 import CartConflictModal from './components/modals/CartConflictModal';
@@ -26,9 +27,21 @@ import CartConflictModal from './components/modals/CartConflictModal';
 import { useLocation as useRouterLocation, useNavigate } from 'react-router-dom';
 const Navbar = () => {
   const { cartCount } = useCart();
-  const { location, setShowSelector } = useLocationContext();
+  const { location, setLocation, locations } = useLocationContext();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const routerLocation = useRouterLocation();
-  const navigate = useNavigate();
   // Pages that should show only a simple header
   const simpleHeaderRoutes = ['/tracking', '/login', '/addresses', '/orders', '/profile'];
   const titles = {
@@ -56,10 +69,39 @@ const Navbar = () => {
       <div className="max-w-screen-xl mx-auto flex justify-between items-center">
         <h1 className="text-brand-orange font-outfit text-2xl font-bold">ShopperPoint</h1>
         <div className="flex items-center gap-4">
-          <button
-            className="text-xs font-bold text-brand-navy bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200 transition"
-            onClick={() => setShowSelector(true)}
-          >{location}</button>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              className="flex items-center gap-2 text-xs font-bold text-brand-navy bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200 transition min-w-[120px]"
+              onClick={() => setDropdownOpen((open) => !open)}
+              type="button"
+            >
+              <span>{location || 'Delivery Address'}</span>
+              <span className="ml-1 text-gray-400">▼</span>
+            </button>
+            {dropdownOpen && (
+              <div className="absolute left-0 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                {locations.map(loc => (
+                  <button
+                    key={loc}
+                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-brand-orange hover:text-white rounded-xl ${loc === location ? 'bg-brand-orange text-white' : 'text-brand-navy'}`}
+                    onClick={() => {
+                      setLocation(loc);
+                      setDropdownOpen(false);
+                    }}
+                  >{loc}</button>
+                ))}
+                <button
+                  className="block w-full text-left px-4 py-2 text-sm text-brand-navy hover:bg-blue-100 rounded-xl border-t border-gray-100"
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    navigate('/map-picker');
+                  }}
+                >
+                  <span role="img" aria-label="map">🗺️</span> Select on Map
+                </button>
+              </div>
+            )}
+          </div>
           <div className="relative w-10 h-10 bg-brand-gray rounded-full flex items-center justify-center cursor-pointer" onClick={() => window.location.pathname = '/checkout'}>
             <FontAwesomeIcon icon={faShoppingCart} size="lg" className="text-brand-orange" />
             {cartCount > 0 && (
@@ -135,6 +177,7 @@ function AppContent() {
           <Route path="/addresses" element={<AddressManager />} />
           <Route path="/orders" element={<Orders />} />
           {/* Fallback */}
+          <Route path="/map-picker" element={<AddressMapPicker onSelect={(coords) => { setLocation(`Lat ${coords.lat}, Lng ${coords.lng}`); navigate(-1); }} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

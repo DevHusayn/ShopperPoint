@@ -6,16 +6,16 @@ export function useOrders() {
     return useContext(OrderContext);
 }
 
+
 export function OrderProvider({ children }) {
-    const [orders, setOrders] = useState([]);
+    // Persistent orders using localStorage
+    const [orders, setOrders] = useState(() => {
+        const saved = localStorage.getItem('sp_orders');
+        return saved ? JSON.parse(saved) : [];
+    });
 
     useEffect(() => {
-        const saved = localStorage.getItem('orders');
-        if (saved) setOrders(JSON.parse(saved));
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('orders', JSON.stringify(orders));
+        localStorage.setItem('sp_orders', JSON.stringify(orders));
     }, [orders]);
 
     const addOrder = (order) => {

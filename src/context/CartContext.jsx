@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
+
 export const CartProvider = ({ children }) => {
     // 1. Initialize State from LocalStorage (Persistence)
     const [cart, setCart] = useState(() => {
@@ -21,12 +22,20 @@ export const CartProvider = ({ children }) => {
 
     const [conflictData, setConflictData] = useState(null); // For the "Clear Cart?" modal
 
-    // 2. Save to LocalStorage whenever cart changes
+    // Delivery Address selection
+    const [selectedAddress, setSelectedAddress] = useState(() => {
+        const saved = localStorage.getItem('sp_selected_address');
+        return saved ? JSON.parse(saved) : null;
+    });
+
+
+    // 2. Save to LocalStorage whenever cart or address changes
     useEffect(() => {
         localStorage.setItem('sp_cart', JSON.stringify(cart));
         localStorage.setItem('sp_active_store', JSON.stringify(activeStore));
         localStorage.setItem('sp_cart_time', JSON.stringify(lastUpdated));
-    }, [cart, activeStore, lastUpdated]);
+        localStorage.setItem('sp_selected_address', JSON.stringify(selectedAddress));
+    }, [cart, activeStore, lastUpdated, selectedAddress]);
 
     // 3. The "Single-Store Guard" Logic
     const addToCart = (product, store) => {
@@ -86,11 +95,13 @@ export const CartProvider = ({ children }) => {
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
     const cartTotal = subtotal;
 
+
     return (
         <CartContext.Provider value={{
             cart, activeStore, conflictData, setConflictData,
             addToCart, removeFromCart, clearCart, resolveConflict,
-            subtotal, cartCount, cartTotal, lastUpdated
+            subtotal, cartCount, cartTotal, lastUpdated,
+            selectedAddress, setSelectedAddress
         }}>
             {children}
         </CartContext.Provider>

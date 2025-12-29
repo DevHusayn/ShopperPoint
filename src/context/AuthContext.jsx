@@ -2,13 +2,28 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
+
 export const AuthProvider = ({ children }) => {
-    // We initialize with a mock user for development
-    const [user, setUser] = useState({
-        id: 'user_01',
-        email: 'shopper@lagos.ng',
-        full_name: 'Customer Chief'
+    // Persistent user authentication
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem('sp_user');
+        if (saved) return JSON.parse(saved);
+        return {
+            id: 'user_01',
+            email: 'shopper@lagos.ng',
+            full_name: 'Customer Chief'
+        };
     });
+
+
+    // Save user to localStorage whenever it changes
+    useEffect(() => {
+        if (user) {
+            localStorage.setItem('sp_user', JSON.stringify(user));
+        } else {
+            localStorage.removeItem('sp_user');
+        }
+    }, [user]);
 
     const [loading, setLoading] = useState(false);
 
