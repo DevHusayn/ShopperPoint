@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faStore, faMotorcycle, faHome, faPhone, faChevronDown, faChevronUp, faArrowLeft, faMapMarkerAlt, faClock } from '@fortawesome/free-solid-svg-icons';
-import { useCart } from '../context/CartContext';
+
+import { useOrders } from '../context/OrderContext';
 import { formatNaira } from '../utils/formatters';
 
 const STEPS = [
@@ -14,8 +15,11 @@ const STEPS = [
 ];
 
 const Tracking = () => {
+
     const navigate = useNavigate();
-    const { cart, activeStore, subtotal } = useCart();
+    const { orders } = useOrders();
+    // Show the most recent order (assume first in array)
+    const latestOrder = orders && orders.length > 0 ? orders[0] : null;
 
     const [currentStep, setCurrentStep] = useState(2); // Simulated progress
     const [showSummary, setShowSummary] = useState(false);
@@ -30,16 +34,15 @@ const Tracking = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-24">
-            {/* Header */}
-            <header className="bg-white px-4 py-4 flex items-center gap-4 sticky top-0 z-50 border-b border-gray-100">
-                <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full">
-                    <FontAwesomeIcon icon={faArrowLeft} size="lg" className="text-brand-navy" />
-                </button>
-                <div>
-                    <h1 className="font-outfit font-bold text-brand-navy leading-none">Track Order</h1>
-                    <p className="text-[10px] font-black text-brand-orange uppercase tracking-widest mt-1">Ref: #SP-8829</p>
+            {/* Custom Back Button */}
+            <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 px-4 py-3">
+                <div className="max-w-screen-xl mx-auto flex items-center gap-4">
+                    <button onClick={() => navigate('/orders?tab=ongoing')} className="p-2 hover:bg-gray-100 rounded-full">
+                        <FontAwesomeIcon icon={faArrowLeft} className="text-brand-navy" />
+                    </button>
+                    <h1 className="font-outfit font-bold text-brand-navy text-lg flex-1 text-center">Track Order</h1>
                 </div>
-            </header>
+            </nav>
 
             {/* Simulated Live Map Section */}
             <div className="relative h-[280px] w-full bg-slate-200 overflow-hidden">
@@ -153,19 +156,35 @@ const Tracking = () => {
                                 className="overflow-hidden border-t border-gray-100"
                             >
                                 <div className="p-5 space-y-4">
-                                    {cart.map(item => (
-                                        <div key={item.id} className="flex justify-between items-center text-sm">
-                                            <div className="flex gap-3">
-                                                <span className="text-brand-orange font-bold">{item.quantity}x</span>
-                                                <span className="text-gray-600 font-medium">{item.name}</span>
+                                    {latestOrder ? (
+                                        <>
+                                            {latestOrder.items.map(item => (
+                                                <div key={item.id} className="flex justify-between items-center text-sm">
+                                                    <div className="flex gap-3">
+                                                        <span className="text-brand-orange font-bold">{item.quantity}x</span>
+                                                        <span className="text-gray-600 font-medium">{item.name}</span>
+                                                    </div>
+                                                    <span className="font-bold text-brand-navy">{formatNaira(item.price * item.quantity)}</span>
+                                                </div>
+                                            ))}
+                                            <div className="pt-4 border-t border-dashed space-y-2 font-black">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-400 uppercase text-[10px] tracking-widest">Items Total</span>
+                                                    <span className="text-brand-navy text-base">{formatNaira(latestOrder.total - 1450)}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-400 uppercase text-[10px] tracking-widest">Delivery Fee</span>
+                                                    <span className="text-brand-navy text-base">{formatNaira(1450)}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center border-t border-gray-200 pt-2">
+                                                    <span className="text-gray-400 uppercase text-[10px] tracking-widest">Total Paid</span>
+                                                    <span className="text-brand-navy text-lg">{formatNaira(latestOrder.total)}</span>
+                                                </div>
                                             </div>
-                                            <span className="font-bold text-brand-navy">{formatNaira(item.price * item.quantity)}</span>
-                                        </div>
-                                    ))}
-                                    <div className="pt-4 border-t border-dashed flex justify-between items-center font-black">
-                                        <span className="text-gray-400 uppercase text-[10px] tracking-widest">Total Paid</span>
-                                        <span className="text-brand-navy text-lg">{formatNaira(subtotal + 1450)}</span>
-                                    </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-gray-400 text-center">No order found.</div>
+                                    )}
                                 </div>
                             </motion.div>
                         )}

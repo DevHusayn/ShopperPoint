@@ -21,6 +21,7 @@ const AddressManager = () => {
     }, [addresses]);
 
     const [isAdding, setIsAdding] = useState(false);
+    const [editId, setEditId] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState({ open: false, id: null });
     const [locating, setLocating] = useState(false);
 
@@ -45,21 +46,41 @@ const AddressManager = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const newAddr = { ...formData, id: Date.now(), selected: false };
-        setAddresses(prev => [...prev, newAddr]);
+        if (editId) {
+            // Update existing address
+            setAddresses(prev => prev.map(addr => addr.id === editId ? { ...addr, ...formData } : addr));
+        } else {
+            // Add new address
+            const newAddr = { ...formData, id: Date.now(), selected: false };
+            setAddresses(prev => [...prev, newAddr]);
+        }
         setIsAdding(false);
+        setEditId(null);
         setFormData({ nickname: 'Home', street: '', area: '', landmark: '' });
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <header className="bg-white p-4 border-b border-gray-100 flex items-center gap-4 sticky top-0 z-10">
-                <button onClick={() => navigate(-1)} className="p-1 hover:bg-gray-100 rounded-full">
-                    <FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" />
-                </button>
-                <h1 className="font-outfit font-bold text-brand-navy">My Addresses</h1>
-            </header>
+            {/* Header: Only show in list mode */}
+            {!isAdding ? (
+                <header className="bg-white p-4 border-b border-gray-100 flex items-center gap-4 sticky top-0 z-10">
+                    <button onClick={() => navigate(-1)} className="p-1 hover:bg-gray-100 rounded-full">
+                        <FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" />
+                    </button>
+                    <h1 className="font-outfit font-bold text-brand-navy">My Addresses</h1>
+                </header>
+            ) : (
+                <header className="bg-white p-4 border-b border-gray-100 flex items-center gap-4 sticky top-0 z-10">
+                    <button onClick={() => {
+                        setIsAdding(false);
+                        setEditId(null);
+                        setFormData({ nickname: 'Home', street: '', area: '', landmark: '' });
+                    }} className="p-1 hover:bg-gray-100 rounded-full">
+                        <FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" />
+                    </button>
+                    <h1 className="font-outfit font-bold text-brand-navy">{editId ? 'Edit Address' : 'Add Address'}</h1>
+                </header>
+            )}
 
             <main className="p-4 max-w-xl mx-auto space-y-4">
                 {!isAdding ? (
@@ -99,15 +120,33 @@ const AddressManager = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <button
-                                            className="text-gray-300 hover:text-red-500 transition-colors"
-                                            onClick={e => {
-                                                e.stopPropagation();
-                                                setConfirmDelete({ open: true, id: addr.id });
-                                            }}
-                                        >
-                                            <FontAwesomeIcon icon={faTrash} size="lg" />
-                                        </button>
+                                        <div className="flex flex-col gap-2 items-end">
+                                            <button
+                                                className="text-gray-300 hover:text-blue-500 transition-colors text-xs mb-1"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    setEditId(addr.id);
+                                                    setFormData({
+                                                        nickname: addr.nickname,
+                                                        street: addr.street,
+                                                        area: addr.area,
+                                                        landmark: addr.landmark
+                                                    });
+                                                    setIsAdding(true);
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                className="text-gray-300 hover:text-red-500 transition-colors"
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    setConfirmDelete({ open: true, id: addr.id });
+                                                }}
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} size="lg" />
+                                            </button>
+                                        </div>
                                         {/* Confirm Delete Modal */}
                                         <ConfirmModal
                                             open={confirmDelete.open}
@@ -141,7 +180,7 @@ const AddressManager = () => {
                     /* Address Entry Form */
                     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-[2rem] shadow-xl space-y-5 animate-slide-up">
                         <div className="text-center mb-2">
-                            <h2 className="font-outfit font-bold text-xl text-brand-navy">Add Address</h2>
+                            <h2 className="font-outfit font-bold text-xl text-brand-navy">{editId ? 'Edit Address' : 'Add Address'}</h2>
                             <p className="text-xs text-gray-400">Where are we delivering to?</p>
                         </div>
 
@@ -209,7 +248,11 @@ const AddressManager = () => {
                         <div className="flex gap-3 pt-4">
                             <button
                                 type="button"
-                                onClick={() => setIsAdding(false)}
+                                onClick={() => {
+                                    setIsAdding(false);
+                                    setEditId(null);
+                                    setFormData({ nickname: 'Home', street: '', area: '', landmark: '' });
+                                }}
                                 className="flex-1 py-4 font-bold text-gray-400 text-sm"
                             >
                                 Cancel

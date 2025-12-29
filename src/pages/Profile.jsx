@@ -17,7 +17,7 @@ const Profile = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white p-6">
+        <div className="min-h-screen bg-white p-2 sm:p-6">
             <div className="flex flex-col items-center mb-8">
                 <FontAwesomeIcon icon={faUserCircle} size="5x" className="text-brand-orange mb-2" />
                 <h2 className="text-xl font-bold text-brand-navy">{user.name || 'Your Name'}</h2>

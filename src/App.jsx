@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faHome, faBoxOpen, faUser, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faHome, faBoxOpen, faUser, faChevronLeft, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Providers (The "Brains" of the app)
@@ -30,7 +30,7 @@ const Navbar = () => {
   const { location, setLocation, locations } = useLocationContext();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -43,6 +43,7 @@ const Navbar = () => {
   }, []);
   const routerLocation = useRouterLocation();
   // Pages that should show only a simple header
+  const mainPages = ['/', '/search', '/orders', '/profile'];
   const simpleHeaderRoutes = ['/tracking', '/login', '/addresses', '/orders', '/profile'];
   const titles = {
     '/tracking': 'Track Order',
@@ -55,9 +56,12 @@ const Navbar = () => {
     return (
       <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 px-4 py-3">
         <div className="max-w-screen-xl mx-auto flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full">
-            <FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" />
-          </button>
+          {/* Only show back arrow if not on a main page */}
+          {!mainPages.includes(routerLocation.pathname) && (
+            <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full">
+              <FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" />
+            </button>
+          )}
           <h1 className="font-outfit font-bold text-brand-navy text-lg flex-1 text-center">{titles[routerLocation.pathname]}</h1>
         </div>
       </nav>
@@ -135,15 +139,17 @@ import { useLocation } from 'react-router-dom';
 function AppContent() {
   const location = useLocation();
   const { showSelector, setShowSelector, locations, setLocation } = useLocationContext();
-  const hideNavbarRoutes = ['/checkout'];
-  const showNavbar = !hideNavbarRoutes.includes(location.pathname);
+  const hideNavbarRoutes = ['/checkout', '/', '/search', '/tracking', '/addresses'];
+  // Hide Navbar on all /store/* routes (wildcard match)
+  const isStorefront = location.pathname.startsWith('/store/');
+  const showNavbar = !hideNavbarRoutes.includes(location.pathname) && !isStorefront;
   return (
-    <div className="min-h-screen bg-brand-gray">
+    <div className="min-h-screen bg-brand-gray flex flex-col">
       {showNavbar && <Navbar />}
       {/* Location Selector Modal */}
       {showSelector && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full text-center border border-brand-orange">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/30 px-2 sm:px-0">
+          <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-8 max-w-xs w-full text-center border border-brand-orange">
             <h2 className="text-lg font-bold text-brand-navy mb-4">Select Your Location</h2>
             <div className="space-y-2 mb-4">
               {locations.map(loc => (
@@ -162,7 +168,7 @@ function AppContent() {
         </div>
       )}
       {/* Main Content Area */}
-      <main className="max-w-screen-xl mx-auto bg-white min-h-[calc(100vh-64px)] shadow-sm relative">
+      <main className="flex-1 w-full max-w-screen-xl mx-auto bg-white min-h-[calc(100vh-64px)] shadow-sm relative px-2 sm:px-4 md:px-8 lg:px-12 xl:px-16">
         <Routes>
           {/* Discovery / Home */}
           <Route path="/" element={<Discovery />} />
@@ -181,18 +187,23 @@ function AppContent() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      {/* Mobile Bottom Nav */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden flex justify-around py-3 z-40">
-        <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/'}>
-          <FontAwesomeIcon icon={faHome} size="lg" className="mb-1" /> Explore
-        </button>
-        <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/orders'}>
-          <FontAwesomeIcon icon={faBoxOpen} size="lg" className="mb-1" /> Orders
-        </button>
-        <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/profile'}>
-          <FontAwesomeIcon icon={faUser} size="lg" className="mb-1" /> Profile
-        </button>
-      </footer>
+      {/* Mobile Bottom Nav: Only show on main tab pages */}
+      {['/', '/search', '/orders', '/profile'].includes(location.pathname) && (
+        <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-40">
+          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/'}>
+            <FontAwesomeIcon icon={faHome} size="lg" className={`mb-1 ${location.pathname === '/' ? 'text-brand-orange' : 'text-gray-400'}`} /> Home
+          </button>
+          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/search' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/search'}>
+            <FontAwesomeIcon icon={faSearch} size="lg" className={`mb-1 ${location.pathname === '/search' ? 'text-brand-orange' : 'text-gray-400'}`} /> Search
+          </button>
+          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/orders'}>
+            <FontAwesomeIcon icon={faBoxOpen} size="lg" className={`mb-1 ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} /> Orders
+          </button>
+          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/profile'}>
+            <FontAwesomeIcon icon={faUser} size="lg" className={`mb-1 ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} /> Profile
+          </button>
+        </footer>
+      )}
       {/* Global Modals */}
       <CartConflictModal />
     </div>

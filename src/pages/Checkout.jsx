@@ -33,6 +33,7 @@ const Checkout = () => {
                 items: cart,
                 total,
                 date: new Date().toLocaleString(),
+                // status will be set in context
             });
             setShowSuccessModal(true);
         }, 2500);
@@ -58,7 +59,7 @@ const Checkout = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-56 mb-24">
+        <div className="min-h-screen bg-gray-50 pb-56 mb-24 px-2 sm:px-0">
             {/* Payment Success Modal */}
             {showSuccessModal && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/30">
@@ -80,7 +81,7 @@ const Checkout = () => {
                 </div>
             )}
             {/* Trust Header (retained) */}
-            <header className="bg-white px-4 py-4 border-b border-gray-100 sticky top-0 z-10 flex items-center gap-4">
+            <header className="bg-white px-2 sm:px-4 py-4 border-b border-gray-100 sticky top-0 z-10 flex items-center gap-4">
                 <button onClick={() => navigate(-1)}><FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" /></button>
                 <h1 className="text-lg font-bold text-brand-navy">Checkout</h1>
                 <div className="ml-auto flex items-center gap-1 text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded">
@@ -88,7 +89,7 @@ const Checkout = () => {
                 </div>
             </header>
 
-            <div className="max-w-xl mx-auto p-4 space-y-4">
+            <div className="max-w-xl mx-auto p-2 sm:p-4 space-y-4">
                 {/* Order Summary Card */}
                 <section className="bg-white rounded-2xl p-4 shadow-sm">
                     <h2 className="text-[10px] uppercase font-black text-gray-400 mb-4 tracking-widest">Items from {activeStore?.brand}</h2>
@@ -178,7 +179,7 @@ const Checkout = () => {
             </div>
 
             {/* Fixed "Pay Now" Button Container */}
-            <div className="fixed bottom-13 left-0 right-0 bg-white p-4 border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-13 left-0 right-0 bg-white p-2 sm:p-4 border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
                 <div className="max-w-xl mx-auto">
                     <button
                         disabled={isProcessing}

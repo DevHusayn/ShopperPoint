@@ -19,7 +19,11 @@ export function OrderProvider({ children }) {
     }, [orders]);
 
     const addOrder = (order) => {
-        setOrders(prev => [order, ...prev]);
+        // Add status: 'ongoing' by default
+        setOrders(prev => [
+            { ...order, status: 'ongoing' },
+            ...prev
+        ]);
     };
 
     return (

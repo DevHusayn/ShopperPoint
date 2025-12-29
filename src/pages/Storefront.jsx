@@ -33,10 +33,10 @@ const Storefront = () => {
     return (
         <div className="relative min-h-screen bg-white">
             {/* Header */}
-            <header className="sticky top-0 z-40 bg-white border-b border-gray-100 p-4">
-                <div className="flex items-center justify-between mb-4">
+            <header className="sticky top-0 z-40 bg-white border-b border-gray-100 p-2 sm:p-4">
+                <div className="flex items-center justify-between mb-4 gap-2">
                     <button onClick={() => navigate('/')} className="p-1"><FontAwesomeIcon icon={faChevronLeft} /></button>
-                    <div className="text-center">
+                    <div className="flex-1 text-center">
                         <h1 className="font-outfit font-bold text-brand-navy">{store.brand}</h1>
                         <p className="text-[10px] text-gray-500 font-bold uppercase">{store.branchName}</p>
                     </div>
@@ -44,7 +44,7 @@ const Storefront = () => {
                 </div>
 
                 {/* Categories Bar */}
-                <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                     {categories.map(cat => (
                         <button
                             key={cat}
@@ -59,14 +59,14 @@ const Storefront = () => {
             </header>
 
             {/* Product Grid */}
-            <main className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 pb-32">
+            <main className="p-2 sm:p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 pb-32">
                 {PRODUCTS.filter(p => selectedCategory === 'All' || p.category === selectedCategory).map(product => (
-                    <div key={product.id} className="border border-gray-100 rounded-2xl p-3 flex flex-col group">
-                        <div className="relative h-32 mb-3 bg-gray-50 rounded-xl overflow-hidden">
+                    <div key={product.id} className="border border-gray-100 rounded-2xl p-2 sm:p-3 flex flex-col group">
+                        <div className="relative h-28 sm:h-32 mb-3 bg-gray-50 rounded-xl overflow-hidden">
                             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                             <button
                                 onClick={() => handleQuickAdd(product)}
-                                className={`absolute bottom-2 right-2 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${addedId === product.id ? 'bg-green-500' : 'bg-brand-orange'
+                                className={`absolute bottom-2 right-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${addedId === product.id ? 'bg-green-500' : 'bg-brand-orange'
                                     } text-white`}
                             >
                                 {addedId === product.id ? <FontAwesomeIcon icon={faCheck} size="sm" /> : <FontAwesomeIcon icon={faPlus} size="lg" />}
@@ -80,7 +80,7 @@ const Storefront = () => {
 
             {/* Floating Cart Bar */}
             {cartCount > 0 && (
-                <div className="fixed bottom-20 left-4 right-4 z-50 animate-bounce-in">
+                <div className="fixed bottom-20 left-2 right-2 sm:left-4 sm:right-4 z-50 animate-bounce-in">
                     <button
                         onClick={() => navigate('/checkout')}
                         className="w-full bg-brand-navy text-white flex items-center justify-between p-4 rounded-2xl shadow-2xl"

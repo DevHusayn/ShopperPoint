@@ -7,7 +7,7 @@ import { useCart } from '../context/CartContext';
 
 const Orders = () => {
     const { orders } = useOrders();
-    const { cart, cartCount, cartTotal, activeStore } = useCart();
+    const { cart, cartCount, cartTotal, activeStore, clearCart } = useCart();
     const navigate = useNavigate();
     const location = useLocation();
     const getInitialTab = () => {
@@ -18,15 +18,14 @@ const Orders = () => {
     };
     const [tab, setTab] = useState(getInitialTab());
 
-    // Example: Ongoing = orders without a delivered flag, Completed = orders with delivered flag
-    // For demo, treat the first order as ongoing, rest as completed
-    const ongoingOrders = orders.length > 0 ? [orders[0]] : [];
-    const completedOrders = orders.length > 1 ? orders.slice(1) : [];
+    // Ongoing = status !== 'delivered', Completed = status === 'delivered'
+    const ongoingOrders = orders.filter(order => order.status !== 'delivered');
+    const completedOrders = orders.filter(order => order.status === 'delivered');
 
     return (
-        <div className="min-h-screen bg-white p-0">
+        <div className="min-h-screen bg-white p-0 px-1 sm:px-0">
             {/* Tabs */}
-            <div className="flex justify-around border-b border-gray-100 bg-white sticky top-0 z-10">
+            <div className="flex justify-around border-b border-gray-100 bg-white sticky top-0 z-10 text-xs sm:text-base">
                 <button onClick={() => setTab('cart')} className={`flex-1 py-4 font-bold ${tab === 'cart' ? 'text-brand-orange border-b-2 border-brand-orange bg-orange-50' : 'text-gray-400'}`}>
                     My Cart
                 </button>
@@ -39,7 +38,7 @@ const Orders = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="p-4">
+            <div className="p-2 sm:p-4">
                 {tab === 'cart' && (
                     <div>
                         <h2 className="text-lg font-bold mb-4 text-brand-navy flex items-center gap-2"><FontAwesomeIcon icon={faShoppingCart} /> My Cart</h2>
@@ -60,6 +59,7 @@ const Orders = () => {
                                 ))}
                                 <div className="pt-2 text-right font-black text-brand-navy">Total: ₦{cartTotal}</div>
                                 <button onClick={() => navigate('/checkout')} className="mt-4 bg-brand-orange text-white px-4 py-2 rounded-xl font-bold w-full">Checkout</button>
+                                <button onClick={clearCart} className="mt-2 bg-gray-100 text-brand-orange px-4 py-2 rounded-xl font-bold w-full border border-brand-orange/30 hover:bg-orange-50 transition">Clear Selection</button>
                             </div>
                         )}
                     </div>

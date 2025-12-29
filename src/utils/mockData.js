@@ -32,9 +32,9 @@ export const MALL_BRANCHES = [
 ];
 
 export const PRODUCTS = [
-    { id: 1, name: 'Golden Penny Flour 1kg', price: 1450, category: 'Provisions', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400' },
-    { id: 2, name: 'Agege Bread Large', price: 900, category: 'Bakery', image: 'https://images.unsplash.com/photo-1598373182133-52452f7691ef?w=400' },
-    { id: 3, name: 'Coca-Cola 60cl x12', price: 4200, category: 'Drinks', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400' },
-    { id: 4, name: 'Titan Fresh Eggs (30)', price: 4800, category: 'Fresh Food', image: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=400' },
-    { id: 5, name: 'Peak Milk Refill 380g', price: 2800, category: 'Provisions', image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400' }
+    { id: 1, name: 'Golden Penny Flour 1kg', price: 1450, category: 'Provisions', brand: 'Jendol', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400' },
+    { id: 2, name: 'Agege Bread Large', price: 900, category: 'Bakery', brand: 'Justrite', image: 'https://images.unsplash.com/photo-1598373182133-52452f7691ef?w=400' },
+    { id: 3, name: 'Coca-Cola 60cl x12', price: 4200, category: 'Drinks', brand: 'Shoprite', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400' },
+    { id: 4, name: 'Titan Fresh Eggs (30)', price: 4800, category: 'Fresh Food', brand: 'Jendol', image: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=400' },
+    { id: 5, name: 'Peak Milk Refill 380g', price: 2800, category: 'Provisions', brand: 'Shoprite', image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400' }
 ];
