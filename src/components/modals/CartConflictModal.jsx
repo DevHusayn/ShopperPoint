@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, AlertCircle } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../../context/CartContext';
 
 const CartConflictModal = () => {
@@ -29,7 +30,7 @@ const CartConflictModal = () => {
                         >
                             <div className="flex justify-center -mt-16 mb-6">
                                 <div className="bg-white p-4 rounded-full shadow-lg text-brand-orange">
-                                    <AlertCircle size={40} />
+                                    <FontAwesomeIcon icon={faExclamationCircle} size="2x" />
                                 </div>
                             </div>
 

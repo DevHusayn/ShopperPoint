@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Search, ShoppingBag } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faSearch, faShoppingBag } from '@fortawesome/free-solid-svg-icons';
 import { MALL_BRANCHES } from '../utils/mockData';
 
 const Discovery = () => {
@@ -11,7 +12,7 @@ const Discovery = () => {
             {/* Header Section */}
             <section className="bg-brand-navy p-6 pt-10 text-white rounded-b-[2rem]">
                 <div className="flex items-center gap-2 mb-6">
-                    <MapPin className="text-brand-orange" size={20} />
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-brand-orange" size="lg" />
                     <div>
                         <p className="text-[10px] opacity-70 uppercase font-bold">Shopping in</p>
                         <p className="font-bold text-sm">Ikeja, Lagos</p>
@@ -23,7 +24,7 @@ const Discovery = () => {
                         onClick={() => navigate('/search')}
                         className="flex bg-white rounded-xl items-center px-4 py-3 shadow-lg cursor-pointer"
                     >
-                        <Search className="text-gray-400" size={20} />
+                        <FontAwesomeIcon icon={faSearch} className="text-gray-400" size="lg" />
                         <span className="ml-3 flex-1 text-gray-400 text-sm">Search bread, milk, eggs...</span>
                     </div>
                 </div>

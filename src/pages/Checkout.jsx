@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import ConfirmModal from '../components/modals/ConfirmModal';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, MapPin, ShieldCheck, CreditCard, Info, AlertTriangle } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faMapMarkerAlt, faShieldAlt, faCreditCard, faInfoCircle, faExclamationTriangle, faShoppingCart, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useOrders } from '../context/OrderContext';
 import { formatNaira } from '../utils/formatters';
 
 const Checkout = () => {
     const navigate = useNavigate();
-    const { cart, activeStore, subtotal, clearCart } = useCart();
+    const { cart, activeStore, subtotal, clearCart, removeFromCart } = useCart();
     const { user } = useAuth();
+    const { addOrder } = useOrders();
     const [isProcessing, setIsProcessing] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [confirmRemove, setConfirmRemove] = useState({ open: false, itemId: null });
 
     // Business Logic: Fixed fees for Lagos Hyperlocal
     const deliveryFee = 1200;
@@ -18,15 +24,17 @@ const Checkout = () => {
 
     const handlePayment = () => {
         setIsProcessing(true);
-
-        // Simulate Paystack Gateway Delay
         setTimeout(() => {
             setIsProcessing(false);
-            // In a real app, we would save to Supabase here
-            alert("Payment Successful! Your order has been sent to " + activeStore.brand);
-
-            // We clear the cart but usually we'd pass an Order ID to Tracking
-            navigate('/tracking');
+            // Save order to context/localStorage
+            addOrder({
+                id: Date.now(),
+                store: activeStore?.brand,
+                items: cart,
+                total,
+                date: new Date().toLocaleString(),
+            });
+            setShowSuccessModal(true);
         }, 2500);
     };
 
@@ -34,7 +42,9 @@ const Checkout = () => {
     if (cart.length === 0) {
         return (
             <div className="h-screen flex flex-col items-center justify-center p-6 text-center">
-                <div className="bg-gray-100 p-6 rounded-full mb-4 text-4xl">🛒</div>
+                <div className="bg-gray-100 p-6 rounded-full mb-4 text-4xl">
+                    <FontAwesomeIcon icon={faShoppingCart} size="2x" />
+                </div>
                 <h2 className="text-xl font-bold text-brand-navy">Your cart is empty</h2>
                 <p className="text-gray-500 mb-6">Add some items from a store to continue.</p>
                 <button
@@ -48,13 +58,33 @@ const Checkout = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-40">
-            {/* Trust Header */}
+        <div className="min-h-screen bg-gray-50 pb-56 mb-24">
+            {/* Payment Success Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/30">
+                    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full text-center border border-green-100">
+                        <div className="mb-4 text-green-500">
+                            <FontAwesomeIcon icon={faCheckCircle} size="3x" />
+                        </div>
+                        <h2 className="text-lg font-bold text-brand-navy mb-2">Payment Successful!</h2>
+                        <p className="text-sm text-gray-500 mb-4">Your order has been sent to <span className="font-bold text-brand-orange">{activeStore?.brand}</span>.</p>
+                        <button
+                            className="bg-brand-orange text-white px-6 py-2 rounded-xl font-bold w-full mt-2"
+                            onClick={() => {
+                                clearCart();
+                                setShowSuccessModal(false);
+                                navigate('/orders?tab=ongoing');
+                            }}
+                        >Track Order</button>
+                    </div>
+                </div>
+            )}
+            {/* Trust Header (retained) */}
             <header className="bg-white px-4 py-4 border-b border-gray-100 sticky top-0 z-10 flex items-center gap-4">
-                <button onClick={() => navigate(-1)}><ChevronLeft className="text-brand-navy" /></button>
+                <button onClick={() => navigate(-1)}><FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" /></button>
                 <h1 className="text-lg font-bold text-brand-navy">Checkout</h1>
                 <div className="ml-auto flex items-center gap-1 text-[10px] font-black text-green-600 bg-green-50 px-2 py-1 rounded">
-                    <ShieldCheck size={12} /> SECURE
+                    <FontAwesomeIcon icon={faShieldAlt} size="xs" /> SECURE
                 </div>
             </header>
 
@@ -65,11 +95,33 @@ const Checkout = () => {
                     <div className="divide-y divide-gray-50">
                         {cart.map(item => (
                             <div key={item.id} className="py-3 flex justify-between items-center">
-                                <div className="flex gap-3">
+                                <div className="flex gap-3 items-center">
                                     <span className="text-brand-orange font-bold text-sm">{item.quantity}x</span>
                                     <span className="text-sm font-medium text-brand-navy">{item.name}</span>
                                 </div>
-                                <span className="text-sm font-bold text-brand-navy">{formatNaira(item.price * item.quantity)}</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-bold text-brand-navy">{formatNaira(item.price * item.quantity)}</span>
+                                    <button
+                                        className="ml-2 text-xs text-red-500 hover:text-white hover:bg-red-500 border border-red-200 rounded-full px-2 py-1 transition"
+                                        title="Remove item"
+                                        onClick={() => setConfirmRemove({ open: true, itemId: item.id })}
+                                    >
+                                        Remove
+                                    </button>
+                                    {/* Remove Item Confirmation Modal */}
+                                    <ConfirmModal
+                                        open={confirmRemove.open}
+                                        title="Remove Item"
+                                        message="Are you sure you want to remove this item from your cart?"
+                                        confirmText="Remove"
+                                        cancelText="Cancel"
+                                        onConfirm={() => {
+                                            removeFromCart(confirmRemove.itemId);
+                                            setConfirmRemove({ open: false, itemId: null });
+                                        }}
+                                        onCancel={() => setConfirmRemove({ open: false, itemId: null })}
+                                    />
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -82,7 +134,7 @@ const Checkout = () => {
                         <button className="text-xs font-bold text-brand-orange">Change</button>
                     </div>
                     <div className="flex gap-3 items-start">
-                        <MapPin className="text-brand-orange mt-1" size={18} />
+                        <FontAwesomeIcon icon={faMapMarkerAlt} className="text-brand-orange mt-1" size="18" />
                         <div>
                             <p className="text-sm font-bold text-brand-navy">Home</p>
                             <p className="text-xs text-gray-500 leading-relaxed">Plot 12, Admiralty Way, Lekki Phase 1, Lagos</p>
@@ -102,7 +154,7 @@ const Checkout = () => {
                             <span className="font-semibold text-brand-navy">{formatNaira(subtotal)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-500 flex items-center gap-1">Delivery Fee <Info size={12} /></span>
+                            <span className="text-gray-500 flex items-center gap-1">Delivery Fee <FontAwesomeIcon icon={faInfoCircle} size="12" /></span>
                             <span className="font-semibold text-brand-navy">{formatNaira(deliveryFee)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
@@ -124,7 +176,7 @@ const Checkout = () => {
             </div>
 
             {/* Fixed "Pay Now" Button Container */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-13 left-0 right-0 bg-white p-4 border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
                 <div className="max-w-xl mx-auto">
                     <button
                         disabled={isProcessing}
@@ -132,7 +184,7 @@ const Checkout = () => {
                         className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all ${isProcessing ? 'bg-gray-200 text-gray-400' : 'bg-brand-orange text-white shadow-lg active:scale-95'
                             }`}
                     >
-                        <CreditCard size={20} />
+                        <FontAwesomeIcon icon={faCreditCard} size="20" />
                         {isProcessing ? 'Connecting to Paystack...' : `Pay ${formatNaira(total)}`}
                     </button>
                     <div className="mt-3 flex items-center justify-center gap-2 grayscale opacity-50">

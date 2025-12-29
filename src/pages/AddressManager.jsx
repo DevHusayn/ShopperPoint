@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    MapPin,
-    Navigation,
-    Plus,
-    Trash2,
-    Home,
-    Briefcase,
-    Map as MapIcon,
-    ChevronLeft,
-    Check
-} from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faLocationArrow, faPlus, faTrash, faHome, faBriefcase, faMap, faChevronLeft, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../context/CartContext'; // Note: Addresses can be managed via Cart or Auth context
 
 const AddressManager = () => {
@@ -62,7 +53,7 @@ const AddressManager = () => {
             {/* Header */}
             <header className="bg-white p-4 border-b border-gray-100 flex items-center gap-4 sticky top-0 z-10">
                 <button onClick={() => navigate(-1)} className="p-1 hover:bg-gray-100 rounded-full">
-                    <ChevronLeft className="text-brand-navy" />
+                    <FontAwesomeIcon icon={faChevronLeft} className="text-brand-navy" />
                 </button>
                 <h1 className="font-outfit font-bold text-brand-navy">My Addresses</h1>
             </header>
@@ -80,7 +71,7 @@ const AddressManager = () => {
                                 >
                                     <div className="flex gap-4">
                                         <div className="bg-orange-50 p-3 rounded-xl h-fit text-brand-orange">
-                                            {addr.nickname === 'Home' ? <Home size={20} /> : <Briefcase size={20} />}
+                                            {addr.nickname === 'Home' ? <FontAwesomeIcon icon={faHome} size="lg" /> : <FontAwesomeIcon icon={faBriefcase} size="lg" />}
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-1">
@@ -95,13 +86,13 @@ const AddressManager = () => {
 
                                             {/* Landmark Badge - Critical for Logistics */}
                                             <div className="inline-flex items-center gap-2 bg-brand-navy text-white px-3 py-1.5 rounded-lg">
-                                                <MapIcon size={12} className="text-brand-orange" />
+                                                <FontAwesomeIcon icon={faMap} size="xs" className="text-brand-orange" />
                                                 <span className="text-[10px] font-bold">Landmark: {addr.landmark}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <button className="text-gray-300 hover:text-red-500 transition-colors">
-                                        <Trash2 size={18} />
+                                        <FontAwesomeIcon icon={faTrash} size="lg" />
                                     </button>
                                 </div>
                             ))}
@@ -111,7 +102,7 @@ const AddressManager = () => {
                             onClick={() => setIsAdding(true)}
                             className="w-full py-5 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center gap-2 text-gray-400 font-bold hover:border-brand-orange hover:text-brand-orange transition-all"
                         >
-                            <Plus size={20} /> Add New Address
+                            <FontAwesomeIcon icon={faPlus} size="lg" /> Add New Address
                         </button>
                     </>
                 ) : (
@@ -142,7 +133,7 @@ const AddressManager = () => {
                             disabled={locating}
                             className="w-full bg-brand-orange/10 text-brand-orange py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-bold border border-brand-orange/20 active:scale-95 transition-all"
                         >
-                            <Navigation size={18} className={locating ? "animate-spin" : ""} />
+                            <FontAwesomeIcon icon={faLocationArrow} size="lg" className={locating ? "animate-spin" : ""} />
                             {locating ? "Fetching GPS..." : "Use Current Location"}
                         </button>
 
@@ -178,7 +169,7 @@ const AddressManager = () => {
                                         required
                                         onChange={e => setFormData({ ...formData, landmark: e.target.value })}
                                     />
-                                    <MapIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-orange" />
+                                    <FontAwesomeIcon icon={faMapMarkerAlt} size="lg" className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-orange" />
                                 </div>
                             </div>
                         </div>

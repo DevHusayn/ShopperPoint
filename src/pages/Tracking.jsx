@@ -1,26 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    CheckCircle2,
-    Store,
-    Bike,
-    Home,
-    Phone,
-    ChevronDown,
-    ChevronUp,
-    ArrowLeft,
-    MapPin,
-    Clock
-} from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faStore, faMotorcycle, faHome, faPhone, faChevronDown, faChevronUp, faArrowLeft, faMapMarkerAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/formatters';
 
 const STEPS = [
-    { id: 1, label: 'Order Confirmed', icon: CheckCircle2, desc: 'Your order is being processed' },
-    { id: 2, label: 'Rider at Store', icon: Store, desc: 'Tunde is picking up your items' },
-    { id: 3, label: 'Out for Delivery', icon: Bike, desc: 'Rider is heading to your location' },
-    { id: 4, label: 'Arrived', icon: Home, desc: 'Enjoy your shopping!' },
+    { id: 1, label: 'Order Confirmed', icon: faCheckCircle, desc: 'Your order is being processed' },
+    { id: 2, label: 'Rider at Store', icon: faStore, desc: 'Tunde is picking up your items' },
+    { id: 3, label: 'Out for Delivery', icon: faMotorcycle, desc: 'Rider is heading to your location' },
+    { id: 4, label: 'Arrived', icon: faHome, desc: 'Enjoy your shopping!' },
 ];
 
 const Tracking = () => {
@@ -42,8 +32,8 @@ const Tracking = () => {
         <div className="min-h-screen bg-gray-50 pb-24">
             {/* Header */}
             <header className="bg-white px-4 py-4 flex items-center gap-4 sticky top-0 z-50 border-b border-gray-100">
-                <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded-full">
-                    <ArrowLeft size={20} className="text-brand-navy" />
+                <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full">
+                    <FontAwesomeIcon icon={faArrowLeft} size="lg" className="text-brand-navy" />
                 </button>
                 <div>
                     <h1 className="font-outfit font-bold text-brand-navy leading-none">Track Order</h1>
@@ -61,7 +51,7 @@ const Tracking = () => {
                     <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="bg-brand-orange/10 p-2 rounded-lg text-brand-orange">
-                                <Clock size={20} />
+                                <FontAwesomeIcon icon={faClock} size="lg" />
                             </div>
                             <div>
                                 <p className="text-[10px] font-black text-gray-400 uppercase leading-none">Estimated Arrival</p>
@@ -83,7 +73,7 @@ const Tracking = () => {
                 >
                     <div className="relative">
                         <div className="bg-brand-navy p-2.5 rounded-full shadow-2xl border-2 border-white text-white">
-                            <Bike size={24} />
+                            <FontAwesomeIcon icon={faMotorcycle} size="lg" />
                         </div>
                         <div className="absolute inset-0 bg-brand-navy rounded-full animate-ping opacity-20" />
                     </div>
@@ -106,7 +96,7 @@ const Tracking = () => {
                         </div>
                     </div>
                     <a href="tel:08000000000" className="bg-green-500 p-4 rounded-2xl text-white shadow-lg shadow-green-100 active:scale-90 transition-transform">
-                        <Phone size={22} fill="currentColor" />
+                        <FontAwesomeIcon icon={faPhone} size="lg" />
                     </a>
                 </section>
 
@@ -117,7 +107,6 @@ const Tracking = () => {
                         {STEPS.map((step, idx) => {
                             const isCompleted = currentStep > step.id;
                             const isActive = currentStep === step.id;
-                            const Icon = step.icon;
 
                             return (
                                 <div key={step.id} className="relative flex gap-5">
@@ -127,10 +116,10 @@ const Tracking = () => {
                                     )}
 
                                     <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${isCompleted ? 'bg-green-500 text-white' :
-                                            isActive ? 'bg-brand-orange text-white ring-8 ring-orange-50' :
-                                                'bg-gray-100 text-gray-300'
+                                        isActive ? 'bg-brand-orange text-white ring-8 ring-orange-50' :
+                                            'bg-gray-100 text-gray-300'
                                         }`}>
-                                        <Icon size={18} />
+                                        <FontAwesomeIcon icon={step.icon} size="lg" />
                                     </div>
 
                                     <div>
@@ -152,7 +141,7 @@ const Tracking = () => {
                         className="w-full p-5 flex justify-between items-center bg-gray-50/50 hover:bg-gray-50 transition-colors"
                     >
                         <span className="font-bold text-sm text-brand-navy">View Order Items</span>
-                        {showSummary ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        {showSummary ? <FontAwesomeIcon icon={faChevronUp} size="lg" /> : <FontAwesomeIcon icon={faChevronDown} size="lg" />}
                     </button>
 
                     <AnimatePresence>

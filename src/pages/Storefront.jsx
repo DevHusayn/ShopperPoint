@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Search, Plus, Check, ShoppingCart } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faSearch, faPlus, faCheck, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { MALL_BRANCHES, PRODUCTS } from '../utils/mockData';
 import { useCart } from '../context/CartContext';
 import { formatNaira } from '../utils/formatters';
@@ -34,12 +35,12 @@ const Storefront = () => {
             {/* Header */}
             <header className="sticky top-0 z-40 bg-white border-b border-gray-100 p-4">
                 <div className="flex items-center justify-between mb-4">
-                    <button onClick={() => navigate('/')} className="p-1"><ChevronLeft /></button>
+                    <button onClick={() => navigate('/')} className="p-1"><FontAwesomeIcon icon={faChevronLeft} /></button>
                     <div className="text-center">
                         <h1 className="font-outfit font-bold text-brand-navy">{store.brand}</h1>
                         <p className="text-[10px] text-gray-500 font-bold uppercase">{store.branchName}</p>
                     </div>
-                    <button onClick={() => navigate('/search')}><Search size={20} /></button>
+                    <button onClick={() => navigate('/search')}><FontAwesomeIcon icon={faSearch} size="lg" /></button>
                 </div>
 
                 {/* Categories Bar */}
@@ -68,7 +69,7 @@ const Storefront = () => {
                                 className={`absolute bottom-2 right-2 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${addedId === product.id ? 'bg-green-500' : 'bg-brand-orange'
                                     } text-white`}
                             >
-                                {addedId === product.id ? <Check size={18} /> : <Plus size={20} />}
+                                {addedId === product.id ? <FontAwesomeIcon icon={faCheck} size="sm" /> : <FontAwesomeIcon icon={faPlus} size="lg" />}
                             </button>
                         </div>
                         <h3 className="text-xs font-bold text-brand-navy h-8 line-clamp-2">{product.name}</h3>

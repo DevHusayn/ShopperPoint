@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faLock, faArrowRight, faEye, faEyeSlash, faCheckCircle, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -29,7 +30,7 @@ const Login = () => {
             {/* Header Section */}
             <div className="mb-10 text-center">
                 <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-orange-100">
-                    <span className="text-3xl">🛒</span>
+                    <FontAwesomeIcon icon={faShoppingCart} size="2x" className="text-brand-orange" />
                 </div>
                 <h1 className="text-3xl font-outfit font-black text-brand-navy">
                     ShopperPoint
@@ -52,7 +53,7 @@ const Login = () => {
                                 className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-orange/20 focus:bg-white p-4 pl-12 rounded-2xl outline-none transition-all text-sm"
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             />
-                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size="lg" />
                         </div>
                     </div>
 
@@ -67,13 +68,13 @@ const Login = () => {
                                 className="w-full bg-gray-50 border-2 border-transparent focus:border-brand-orange/20 focus:bg-white p-4 pl-12 pr-12 rounded-2xl outline-none transition-all text-sm"
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             />
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                            <FontAwesomeIcon icon={faLock} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size="lg" />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
                             >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                {showPassword ? <FontAwesomeIcon icon={faEyeSlash} size="lg" /> : <FontAwesomeIcon icon={faEye} size="lg" />}
                             </button>
                         </div>
                     </div>
@@ -95,7 +96,7 @@ const Login = () => {
                         ) : (
                             <>
                                 <span>{isSignUp ? "Create Account" : "Sign In"}</span>
-                                <ArrowRight size={18} />
+                                <FontAwesomeIcon icon={faArrowRight} size="lg" />
                             </>
                         )}
                     </button>
@@ -117,11 +118,11 @@ const Login = () => {
                 {/* Value Propositions (Trust Signals) */}
                 <div className="mt-12 grid grid-cols-2 gap-4">
                     <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
-                        <CheckCircle2 size={16} className="text-green-500" />
+                        <FontAwesomeIcon icon={faCheckCircle} size="lg" className="text-green-500" />
                         <span className="text-[10px] font-bold text-gray-600">Fast Delivery</span>
                     </div>
                     <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
-                        <CheckCircle2 size={16} className="text-green-500" />
+                        <FontAwesomeIcon icon={faCheckCircle} size="lg" className="text-green-500" />
                         <span className="text-[10px] font-bold text-gray-600">Secure Payment</span>
                     </div>
                 </div>

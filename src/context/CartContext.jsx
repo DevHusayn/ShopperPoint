@@ -84,12 +84,13 @@ export const CartProvider = ({ children }) => {
     // 4. Global Calculations (Naira ₦)
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartTotal = subtotal;
 
     return (
         <CartContext.Provider value={{
             cart, activeStore, conflictData, setConflictData,
             addToCart, removeFromCart, clearCart, resolveConflict,
-            subtotal, cartCount, lastUpdated
+            subtotal, cartCount, cartTotal, lastUpdated
         }}>
             {children}
         </CartContext.Provider>
