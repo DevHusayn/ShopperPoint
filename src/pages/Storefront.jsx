@@ -9,7 +9,7 @@ import { formatNaira } from '../utils/formatters';
 const Storefront = () => {
     const { storeId } = useParams();
     const navigate = useNavigate();
-    const { addToCart, cartCount, cartTotal } = useCart();
+    const { addToCart, cartCount, cartTotal, activeStore } = useCart();
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [addedId, setAddedId] = useState(null);
 
@@ -60,10 +60,10 @@ const Storefront = () => {
 
             {/* Product Grid */}
             <main className="p-2 sm:p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 pb-32">
-                {PRODUCTS.filter(p => selectedCategory === 'All' || p.category === selectedCategory).map(product => (
+                {React.useMemo(() => PRODUCTS.filter(p => selectedCategory === 'All' || p.category === selectedCategory), [selectedCategory]).map(product => (
                     <div key={product.id} className="border border-gray-100 rounded-2xl p-2 sm:p-3 flex flex-col group">
                         <div className="relative h-28 sm:h-32 mb-3 bg-gray-50 rounded-xl overflow-hidden">
-                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
                             <button
                                 onClick={() => handleQuickAdd(product)}
                                 className={`absolute bottom-2 right-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-all ${addedId === product.id ? 'bg-green-500' : 'bg-brand-orange'
@@ -79,7 +79,7 @@ const Storefront = () => {
             </main>
 
             {/* Floating Cart Bar */}
-            {cartCount > 0 && (
+            {cartCount > 0 && activeStore && (
                 <div className="fixed bottom-20 left-2 right-2 sm:left-4 sm:right-4 z-50 animate-bounce-in">
                     <button
                         onClick={() => navigate('/checkout')}
@@ -87,7 +87,7 @@ const Storefront = () => {
                     >
                         <div className="flex items-center gap-3">
                             <div className="bg-brand-orange px-2 py-1 rounded text-[10px] font-black">{cartCount}</div>
-                            <span className="text-sm font-bold">View Cart from {store.brand}</span>
+                            <span className="text-sm font-bold">View Cart from {activeStore.brand}</span>
                         </div>
                         <span className="font-bold">{formatNaira(cartTotal)}</span>
                     </button>

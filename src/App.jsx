@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart, faHome, faBoxOpen, faUser, faChevronLeft, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingCart, faHome, faShoppingBag, faUser, faChevronLeft, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Providers (The "Brains" of the app)
@@ -10,16 +10,16 @@ import { OrderProvider } from './context/OrderContext';
 import { LocationProvider, useLocationContext } from './context/LocationContext';
 
 // Pages
-import Discovery from './pages/Discovery'; // We renamed Home to Discovery
-import Storefront from './pages/Storefront';
-import Checkout from './pages/Checkout';
-import Tracking from './pages/Tracking';
-import Login from './pages/Login';
-import AddressManager from './pages/AddressManager';
-import SearchPage from './pages/Search';
-import Orders from './pages/Orders';
-import Profile from './pages/Profile';
-import AddressMapPicker from './pages/AddressMapPicker';
+const Discovery = React.lazy(() => import('./pages/Discovery'));
+const Storefront = React.lazy(() => import('./pages/Storefront'));
+const Checkout = React.lazy(() => import('./pages/Checkout'));
+const Tracking = React.lazy(() => import('./pages/Tracking'));
+const Login = React.lazy(() => import('./pages/Login'));
+const AddressManager = React.lazy(() => import('./pages/AddressManager'));
+const SearchPage = React.lazy(() => import('./pages/Search'));
+const Orders = React.lazy(() => import('./pages/Orders'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const AddressMapPicker = React.lazy(() => import('./pages/AddressMapPicker'));
 
 // Components
 import CartConflictModal from './components/modals/CartConflictModal';
@@ -167,25 +167,38 @@ function AppContent() {
           </div>
         </div>
       )}
-      {/* Main Content Area */}
+      {/* Main Content Area with Suspense for code splitting */}
       <main className="flex-1 w-full max-w-screen-xl mx-auto bg-white min-h-[calc(100vh-64px)] shadow-sm relative px-2 sm:px-4 md:px-8 lg:px-12 xl:px-16">
-        <Routes>
-          {/* Discovery / Home */}
-          <Route path="/" element={<Discovery />} />
-          {/* Store & Products */}
-          <Route path="/store/:storeId" element={<Storefront />} />
-          <Route path="/search" element={<SearchPage />} />
-          {/* Checkout & User Flow */}
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/tracking" element={<Tracking />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/addresses" element={<AddressManager />} />
-          <Route path="/orders" element={<Orders />} />
-          {/* Fallback */}
-          <Route path="/map-picker" element={<AddressMapPicker onSelect={(coords) => { setLocation(`Lat ${coords.lat}, Lng ${coords.lng}`); navigate(-1); }} />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <React.Suspense fallback={
+          <div className="w-full h-full flex flex-col gap-4 animate-pulse p-4">
+            <div className="h-8 w-1/3 bg-gray-200 rounded mb-2" />
+            <div className="h-6 w-2/3 bg-gray-100 rounded mb-2" />
+            <div className="h-40 w-full bg-gray-100 rounded mb-4" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded-xl" />
+              ))}
+            </div>
+          </div>
+        }>
+          <Routes>
+            {/* Discovery / Home */}
+            <Route path="/" element={<Discovery />} />
+            {/* Store & Products */}
+            <Route path="/store/:storeId" element={<Storefront />} />
+            <Route path="/search" element={<SearchPage />} />
+            {/* Checkout & User Flow */}
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/tracking" element={<Tracking />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/addresses" element={<AddressManager />} />
+            <Route path="/orders" element={<Orders />} />
+            {/* Fallback */}
+            <Route path="/map-picker" element={<AddressMapPicker onSelect={(coords) => { setLocation(`Lat ${coords.lat}, Lng ${coords.lng}`); navigate(-1); }} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </React.Suspense>
       </main>
       {/* Mobile Bottom Nav: Only show on main tab pages */}
       {['/', '/search', '/orders', '/profile'].includes(location.pathname) && (
@@ -197,7 +210,7 @@ function AppContent() {
             <FontAwesomeIcon icon={faSearch} size="lg" className={`mb-1 ${location.pathname === '/search' ? 'text-brand-orange' : 'text-gray-400'}`} /> Search
           </button>
           <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/orders'}>
-            <FontAwesomeIcon icon={faBoxOpen} size="lg" className={`mb-1 ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} /> Orders
+            <FontAwesomeIcon icon={faShoppingBag} size="lg" className={`mb-1 ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} /> Orders
           </button>
           <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/profile'}>
             <FontAwesomeIcon icon={faUser} size="lg" className={`mb-1 ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} /> Profile

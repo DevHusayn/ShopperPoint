@@ -15,9 +15,13 @@ const SearchPage = () => {
     const navigate = useNavigate();
     const { addToCart, activeStore, cart, conflictData } = useCart();
 
-    // Find all products matching the query
-    const filteredProducts = PRODUCTS.filter(p =>
-        p.name.toLowerCase().includes(query.toLowerCase())
+    // Find the accent color for the active store
+    const activeStoreAccent = activeStore ? (MALL_BRANCHES.find(m => m.brand === activeStore.brand)?.accent || 'bg-brand-orange') : 'bg-brand-orange';
+
+    // Memoize filtered products for performance
+    const filteredProducts = React.useMemo(() =>
+        PRODUCTS.filter(p => p.name.toLowerCase().includes(query.toLowerCase())),
+        [query]
     );
 
     return (
@@ -52,7 +56,7 @@ const SearchPage = () => {
                             return matchingMalls.length > 0 ? (
                                 <div key={product.id} className="border-b border-gray-50 pb-3 sm:pb-4">
                                     <div className="flex gap-2 sm:gap-4 items-center">
-                                        <img src={product.image} className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover" alt="" />
+                                        <img src={product.image} className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover" alt="" loading="lazy" />
                                         <div>
                                             <h4 className="text-sm font-bold text-brand-navy">{product.name}</h4>
                                             <p className="text-brand-orange font-bold text-xs">{formatNaira(product.price)}</p>
@@ -86,7 +90,7 @@ const SearchPage = () => {
             </main>
             {/* Floating Cart Summary */}
             {showCartSummary && cart.length > 0 && (
-                <div className="fixed bottom-24 right-4 z-50 bg-white border border-brand-orange shadow-xl rounded-2xl p-4 w-72 max-w-full animate-fade-in">
+                <div className={`fixed bottom-24 right-4 z-50 shadow-xl rounded-2xl p-4 w-72 max-w-full animate-fade-in border-2 ${activeStoreAccent} bg-white`}>
                     <h4 className="font-bold text-brand-navy mb-2">Cart Updated</h4>
                     <ul className="divide-y divide-gray-100 max-h-40 overflow-y-auto">
                         {cart.map(item => (
