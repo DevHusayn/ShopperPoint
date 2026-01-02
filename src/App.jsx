@@ -106,7 +106,7 @@ const Navbar = () => {
               </div>
             )}
           </div>
-          <div className="relative w-10 h-10 bg-brand-gray rounded-full flex items-center justify-center cursor-pointer" onClick={() => window.location.pathname = '/checkout'}>
+          <div className="relative w-10 h-10 bg-brand-gray rounded-full flex items-center justify-center cursor-pointer" onClick={() => navigate('/checkout')}>
             <FontAwesomeIcon icon={faShoppingCart} size="lg" className="text-brand-orange" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-xs font-bold rounded-full px-2 py-0.5 shadow">{cartCount}</span>
@@ -203,20 +203,30 @@ function AppContent() {
       {/* Mobile Bottom Nav: Only show on main tab pages */}
       {['/', '/search', '/orders', '/profile'].includes(location.pathname) && (
         <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 z-40">
-          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/'}>
-            <FontAwesomeIcon icon={faHome} size="lg" className={`mb-1 ${location.pathname === '/' ? 'text-brand-orange' : 'text-gray-400'}`} /> Home
-          </button>
-          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/search' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/search'}>
-            <FontAwesomeIcon icon={faSearch} size="lg" className={`mb-1 ${location.pathname === '/search' ? 'text-brand-orange' : 'text-gray-400'}`} /> Search
-          </button>
-          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/orders'}>
-            <FontAwesomeIcon icon={faShoppingBag} size="lg" className={`mb-1 ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} /> Orders
-          </button>
-          <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => window.location.pathname = '/profile'}>
-            <FontAwesomeIcon icon={faUser} size="lg" className={`mb-1 ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} /> Profile
-          </button>
+          <NavFooterButtons location={location} />
         </footer>
       )}
+      // Bottom nav buttons as a separate component to use navigate
+      import {useNavigate} from 'react-router-dom';
+      function NavFooterButtons({location}) {
+        const navigate = useNavigate();
+      return (
+      <>
+        <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => navigate('/')}>
+          <FontAwesomeIcon icon={faHome} size="lg" className={`mb-1 ${location.pathname === '/' ? 'text-brand-orange' : 'text-gray-400'}`} /> Home
+        </button>
+        <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/search' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => navigate('/search')}>
+          <FontAwesomeIcon icon={faSearch} size="lg" className={`mb-1 ${location.pathname === '/search' ? 'text-brand-orange' : 'text-gray-400'}`} /> Search
+        </button>
+        <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => navigate('/orders')}>
+          <FontAwesomeIcon icon={faShoppingBag} size="lg" className={`mb-1 ${location.pathname === '/orders' ? 'text-brand-orange' : 'text-gray-400'}`} /> Orders
+        </button>
+        <button className={`flex flex-col items-center text-[12px] font-bold ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} style={{ minWidth: 60 }} onClick={() => navigate('/profile')}>
+          <FontAwesomeIcon icon={faUser} size="lg" className={`mb-1 ${location.pathname === '/profile' ? 'text-brand-orange' : 'text-gray-400'}`} /> Profile
+        </button>
+      </>
+      );
+      }
       {/* Global Modals */}
       <CartConflictModal />
     </div>
